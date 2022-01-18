@@ -1,0 +1,32 @@
+---
+
+# BuildConfig.yaml
+# Config file for the Day 1 Server Build - parms passed to InitDay1.sh
+# Continuouse mode will continuously re-build the server according to a schedule
+# Changing continuous to false will STOP the automatic rebuild cycle
+# Interactive mode will prompt and display to the screen
+# valid frequency value is "all","daily","weekly" or specific day time value  
+# NOTE:  All variables are preceeded by an "_" underline character
+
+mode:
+  _continuous: yes
+  _interactive: no
+  _frequency: daily
+  _displaymessages: yes
+  _run_onlyonprimary: yes
+servers:
+  _servernamenode1: null 
+  _servernamenode2: null
+  _primary_servername: null
+  _secondary_servername: null
+  _management_servername: njss1-ixsfd01a-intbs1.dev.fndlsb.net
+_obscript_stage_dir: /home/jerry.chustek/RefreshScripts
+_restartmode: NULL
+_node1_ip: NULL
+_node2_ip: NULL
+_maxchunks: 115
+_template_state: co
+_bypass_onconfig_check: no
+_bypass_download: no
+_bypass_refresh: no
+_svc_acct: informix

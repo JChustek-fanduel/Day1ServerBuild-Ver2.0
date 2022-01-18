@@ -1,0 +1,90 @@
+#!/bin/sh
+
+#################################################################################
+####                         allocate_Storage_on Secondary                #######  
+###     Runs the storage allocations on the secondary server during day 1 #######
+#################################################################################
+BACKUPDIR=/opt/informix/backups
+BASEDIR=$BACKUPDIR/EXPORTS
+NUMCHUNKS=150
+#####DATABASE DATA FILE SYSTEM
+DATADIR=/opt/informix/data
+## INDICATOR SUBDIRECTORY
+INDIR=$BASEDIR/RUN_INDICATORS
+
+INDIR=$BASEDIR/RUN_INDICATORS
+SERVERNAMEnode2=$2
+THISSERVER=`echo $HOSTNAME`
+LOG=$BASEDIR/DAY1Init.LOG
+
+
+##Allocated Storage for the Database  MAIN DBSPACES
+function allocate_storage
+{
+#run allocations
+
+#Make Directories 
+
+mkdir -p $BASEDIR/messages
+mkdir -p $CONFIG_TEMPLATEDIR
+mkdir -p $BACKUPDIR/full
+mkdir -p $BACKUPDIR/logs
+mkdir -p $BACKUPDIR/awsfiles
+mkdir -p $BASEDIR/Day1binScripts
+
+###NOTE: The Default Location for the DATADIR is /opt/informix/data
+
+cd $DATADIR
+rm -rf tempdbs04 tempdbs05 tempdbs06
+fallocate -l 4G $DATADIR/llogdbs/llogdbs_chk001
+fallocate -l 4G $DATADIR/llogdbs/llogdbs_chk002
+fallocate -l 5G $DATADIR/physdbs
+fallocate -l 4G $DATADIR/tempdbs01/tempdbs01_chk001
+fallocate -l 4G $DATADIR/tempdbs02/tempdbs02_chk001
+fallocate -l 4G $DATADIR/tempdbs03/tempdbs03_chk001
+
+
+#####All chunks to be allocated to the database need to be owner and group informix and 660 permissions
+chown informix:informix $DATADIR/llogdbs/llogdbs_chk001
+chmod 660  $DATADIR/llogdbs/llogdbs_chk001
+chown informix:informix $DATADIR/llogdbs/llogdbs_chk002
+chmod 660  $DATADIR/llogdbs/llogdbs_chk002
+chown informix:informix $DATADIR/physdbs
+chmod 660  $DATADIR/physdbs
+chown informix:informix $DATADIR/tempdbs01/tempdbs01_chk001
+chmod 660  $DATADIR/tempdbs01/tempdbs01_chk001
+chown informix:informix $DATADIR/tempdbs02/tempdbs02_chk001
+chmod 660  $DATADIR/tempdbs02/tempdbs02_chk001
+chown informix:informix $DATADIR/tempdbs03/tempdbs03_chk001
+chmod 660  $DATADIR/tempdbs03/tempdbs03_chk001
+
+##Check allocation of storage
+
+
+#Check ownership and mode
+
+
+}
+
+##Allocate Storage for the Datadbs Dbspace chunks
+function allocate_datadbs_chunks
+{
+
+for i in $(seq -f "%04g" 1 $MAXCHUNKS)
+do
+  FILE=/opt/informix/data/datadbs/datadbs_chk${i}
+  if [ ! -f ${FILE} ]
+  then
+    echo "fallocate -l 4G ${FILE}"
+    fallocate -l 4G ${FILE}
+    chmod 660 ${FILE}
+    chown informix:informix ${FILE}
+  fi
+done
+
+}
+
+echo "Runing Allocate_Storage_on_Secondary  to Create Chunkspaces in the Datadbs DBspace" | tee -a $LOG 
+allocate_storage
+echo "Allocate_Storage_on_Secondary Ended" | tee -a $LOG
+exit 0
